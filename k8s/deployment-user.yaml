@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-user
+spec:
+  # 期望的副本数量
+  replicas: 2
+  # 标签选择器，用于识别它管理的 Pod
+  selector:
+    matchLabels:
+      app: service-user
+  # Pod 模板定义
+  template:
+    metadata:
+      labels:
+        app: service-user
+    spec:
+      containers:
+        # 容器定义
+        - name: service-user
+          image: harbor.company.com/devops/service-user:latest
+          ports:
+            # 容器内部监听的端口
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-user
+spec:
+  # 选择后端 Pod 的标签
+  selector:
+    app: service-user
+  ports:
+    - port: 8080       # Service 自身暴露的端口
+      targetPort: 8080 # 流量转发到 Pod 上的端口
+  # 服务类型，ClusterIP 是默认类型，表示只能在集群内部访问
+  type: ClusterIP
